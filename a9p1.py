@@ -37,15 +37,43 @@ Author: <Your name here>
 """
 
 
+from math import isqrt
 from sys import flags
-from typing import Tuple
+from typing import List, Tuple
+
+
+def _primes_up_to(limit: int) -> List[int]:
+    "Return all primes <= limit using a sieve."
+    if limit < 2:
+        return []
+
+    sieve = bytearray(b"\x01") * (limit + 1)
+    sieve[0:2] = b"\x00\x00"
+    for candidate in range(2, isqrt(limit) + 1):
+        if sieve[candidate]:
+            start = candidate * candidate
+            sieve[start : limit + 1 : candidate] = b"\x00" * (((limit - start) // candidate) + 1)
+
+    return [value for value in range(2, limit + 1) if sieve[value]]
 
 
 def finitePrimeHack(t: int, n: int, e: int) -> Tuple[int, int, int]:
     """
     Hack RSA assuming there are no primes larger than t
     """
-    raise NotImplementedError()
+    for p in _primes_up_to(min(t, isqrt(n))):
+        if n % p != 0:
+            continue
+
+        q = n // p
+        if q > t:
+            continue
+
+        phi = (p - 1) * (q - 1)
+        d = pow(e, -1, phi)
+        return (p, q, d)
+
+    raise ValueError("No valid prime factors found within the threshold.")
 
 
 def test():

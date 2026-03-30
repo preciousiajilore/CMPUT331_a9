@@ -48,7 +48,8 @@ def blockSizeHack(blocks: List[int], n: int, e: int) -> str:
     """
     Hack RSA assuming a block size of 1
     """
-    raise NotImplementedError()
+    block_lookup = {pow(index, e, n): symbol for index, symbol in enumerate(SYMBOLS)}
+    return ''.join(block_lookup[block] for block in blocks)
 
 
 def test():

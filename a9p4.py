@@ -37,14 +37,35 @@ Author: <Your name here>
 """
 
 
+from math import isqrt
 from sys import flags
+
+
+def _is_square(value: int) -> bool:
+    "Return True when value is a perfect square."
+    if value < 0:
+        return False
+    root = isqrt(value)
+    return root * root == value
 
 
 def neighboringPrimesHack(n: int, e: int) -> int:
     """
     Hack RSA assuming the primes used to generate n are neighboring primes
     """
-    raise NotImplementedError()
+    a = isqrt(n)
+    if a * a < n:
+        a += 1
+
+    while True:
+        b2 = a * a - n
+        if _is_square(b2):
+            b = isqrt(b2)
+            p = a - b
+            q = a + b
+            phi = (p - 1) * (q - 1)
+            return pow(e, -1, phi)
+        a += 1
 
 
 def test():
