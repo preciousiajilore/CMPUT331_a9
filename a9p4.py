@@ -41,31 +41,38 @@ from math import isqrt
 from sys import flags
 
 
-def _is_square(value: int) -> bool:
+def isPerfectSquare(value: int) -> bool:
     "Return True when value is a perfect square."
     if value < 0:
         return False
     root = isqrt(value)
     return root * root == value
 
+def fermat(n: int):
+    a  = isqrt(n)
+    if a * a < n:
+        a += 1
+   
+    #Citation: https://en.wikipedia.org/wiki/Fermat%27s_factorization_method 
+    #refer to readme for more details on how this works
+    while True:
+        b2 = a * a - n
+        if isPerfectSquare(b2):
+            b = isqrt(b2)
+            p = a - b
+            q = a + b
+            return p, q
+        a += 1
 
 def neighboringPrimesHack(n: int, e: int) -> int:
     """
     Hack RSA assuming the primes used to generate n are neighboring primes
-    """
-    a = isqrt(n)
-    if a * a < n:
-        a += 1
-
-    while True:
-        b2 = a * a - n
-        if _is_square(b2):
-            b = isqrt(b2)
-            p = a - b
-            q = a + b
-            phi = (p - 1) * (q - 1)
-            return pow(e, -1, phi)
-        a += 1
+   """
+    p, q = fermat(n)
+    phi = (p - 1) * (q - 1)
+    #compute the modular inverse of e mod phi to get d
+    d = pow(e, -1, phi)
+    return d 
 
 
 def test():

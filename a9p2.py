@@ -33,7 +33,7 @@
 """
 CMPUT 331 Assignment 9 Problem 2 Student Solution 
 March 2026 
-Author: <Your name here>
+Author: Precious Ajilore
 """
 
 
@@ -48,8 +48,26 @@ def blockSizeHack(blocks: List[int], n: int, e: int) -> str:
     """
     Hack RSA assuming a block size of 1
     """
-    block_lookup = {pow(index, e, n): symbol for index, symbol in enumerate(SYMBOLS)}
-    return ''.join(block_lookup[block] for block in blocks)
+    #for every symbol in SYMBOLS, get its index 
+    # then i have to encrypt that index with RSA using pow(index, e, n) where
+    # e is the public exponent and n is the modulus and the index is the plaintext
+    # store the result in a dictionary where the key is the encrypted block and the value
+    # is the original symbol
+
+    #print(blocks)
+
+    lookup ={}
+
+    for index, symbol in enumerate(SYMBOLS):
+        #encrypt the index using RSA
+        encrypted_block = pow(index, e, n)
+        #print(f"Symbol: {symbol}, Index: {index}, Encrypted Block: {encrypted_block}")
+
+        #store the mapping from the encrypted block to the original symbol
+        lookup[encrypted_block] = symbol
+    
+    
+    return ''.join(lookup[block] for block in blocks)
 
 
 def test():

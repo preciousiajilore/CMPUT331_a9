@@ -44,15 +44,19 @@ from typing import List
 SYMBOLS = "AEIOGNLTSR"
 
 
-def _integer_cube_root(value: int) -> int:
+def getCubeRoot(value: int) -> int:
     "Return the integer cube root of a perfect cube."
+    if value < 0:
+        raise ValueError("Negative value is not a perfect cube.")
+    
+
     low = 0
-    high = 1
-    while high * high * high < value:
-        high *= 2
+    high = value
 
     while low <= high:
+        #get mid which is the average of low and high
         mid = (low + high) // 2
+        #get the cube of mid
         cube = mid * mid * mid
         if cube == value:
             return mid
@@ -64,24 +68,42 @@ def _integer_cube_root(value: int) -> int:
     raise ValueError("Ciphertext block is not a perfect cube.")
 
 
-def _block_to_text(block: int, block_size: int) -> str:
+def decodeBlock(block: int, block_size: int) -> str:
     "Decode one plaintext block integer into block_size symbols."
+    
+
     base = len(SYMBOLS)
-    chars = []
+    message = []
     for _ in range(block_size):
-        chars.append(SYMBOLS[block % base])
+        message.append(SYMBOLS[block % base])
         block //= base
-    return ''.join(chars)
+    return ''.join(message)
 
 
 def NSizeHack(blocks: List[int], n: int) -> str:
     """
     Hack RSA knowing block size is 6, e is 3, and that none of the words end in the letter A 
     """
-    del n  # The attack works because plaintext^3 stays below n for the tested inputs.
+    #idea is that encryption is c = m^3 mod n,
+    #so that decryption is m = c^1/3 mod n
+    #if m ^ 3 < n then technically the mod n part doesnt do anything
+    #so c = m^3 and so m = c^1/3 
+    #so for each ciphertext block i need to take the integre cube root
+    #then use that to decode that integer back into text
 
-    plaintext = ''.join(_block_to_text(_integer_cube_root(block), 6) for block in blocks)
-    return plaintext.rstrip(SYMBOLS[0])
+    plaintext = ""
+
+    for block in blocks:
+        #get the integer cube root of the block
+        m = getCubeRoot(block)
+
+        #decode the block using 6 symbols
+        blockText = decodeBlock(m, 6)
+
+        #add it to the plaintext
+        plaintext += blockText
+        
+    return plaintext.rstrip('A')
 
 
 def test():
